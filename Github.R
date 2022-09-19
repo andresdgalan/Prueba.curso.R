@@ -22,6 +22,21 @@ gitcreds::gitcreds_set()
 #en R creo un proyecto con version control ----> Github y le copio el URL del repositorio que sale en la web 
 
 library(tidyverse)
+library(ggplot2)
 datos <- read.csv("github_data.csv")
 
-#para guardar la versión creas un commit: pestaña git ---- commit --- staged ticks
+#para guardar la versión creas un commit: pestaña git ---- commit --- staged ticks ---- push
+
+plot(happiness ~ work.hours, data = datos)
+
+#apuntar cosas en issues
+
+ggplot(datos) + geom_point(aes(work.hours, happiness))
+
+modelo <- lm(happiness ~ work.hours, data = datos)
+
+#Pruebas por mi cuenta
+
+hist(datos$work.hours)
+hist(datos$happiness)
+
