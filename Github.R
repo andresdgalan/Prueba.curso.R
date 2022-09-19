@@ -40,3 +40,5 @@ modelo <- lm(happiness ~ work.hours, data = datos)
 hist(datos$work.hours)
 hist(datos$happiness)
 
+cor.test(datos$work.hours, datos$happiness)
+
