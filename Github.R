@@ -42,3 +42,28 @@ hist(datos$happiness)
 
 cor.test(datos$work.hours, datos$happiness)
 
+#subir datos de DIVERSIFICA
+
+DIVERSIFICA.plot <- read.csv2("st.DIVERSIFICA.plot.csv")
+DIVERSIFICA.tree <- read.csv2("st.DIVERSIFICA.tree.strange.csv")
+
+#packages for modelling and visualization
+library(MuMIn)
+library(DHARMa)
+library(ggplot2)
+library(mgcv) 
+library(tidymv) 
+library(visreg) 
+library(mgcViz) 
+library(dplyr)
+
+#remove one row
+DIVERSIFICA.plot <- DIVERSIFICA.plot[-27, ]
+
+DIVERSIFICA.plot$def <- as.numeric(DIVERSIFICA.plot$def)
+
+#check assumptions
+hist(DIVERSIFICA.plot$def)
+shapiro.test(DIVERSIFICA.plot$def)
+
+
