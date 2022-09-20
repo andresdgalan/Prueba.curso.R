@@ -77,3 +77,5 @@ ggplot(but_sum, aes(x=date, y=n_species, color = abundance)) +
   labs(x = "Año",
        y = "Número de especies") +
   scale_color_distiller(palette = "BuGn")
+
+

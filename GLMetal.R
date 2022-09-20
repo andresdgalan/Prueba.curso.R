@@ -62,7 +62,8 @@ estimate_contrasts(m2)
 
 #subir datos de DIVERSIFICA
 
-DIVERSIFICA.plot <- read.csv2("st.DIVERSIFICA.plot.csv")
+DIVERSIFICA.plot <- read_delim("st.DIVERSIFICA.plot.csv", delim = ";")
+
 str(DIVERSIFICA.plot)
 DIVERSIFICA.tree <- read.csv2("st.DIVERSIFICA.tree.strange.csv")
 
