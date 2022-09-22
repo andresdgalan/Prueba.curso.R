@@ -8,23 +8,23 @@ output: word_document
 ```{r Libraries, include=FALSE}
 library(vegan)
 library(mvabund)
+library(here)
 ```
 
 ```{r data, include=FALSE}
 data("iris")
 ```
 
+[CORRELATION BETWEEN FLOWER METRICS]{.ul}
 
-
-CORRELATION BETWEEN FLOWER METRICS
 ```{r plotting, echo=FALSE}
 #to plot all variables by pairs: we plot only numeric variables
 pairs(iris[,1:4])
 cor(iris[,1:4])
 ```
 
+[#PCA analysis]{.ul}
 
-#PCA analysis
 ```{r PCA, echo=FALSE}
 iris.pca <- prcomp(iris[,1:4], scale. = T)
 
@@ -35,15 +35,15 @@ summary(iris.pca)
 #we can see component 1 is really good because it explains 92% of the variance
 ```
 
+[PLOTTING PCA]{.ul}
 
-PLOTTING PCA
 ```{r plotting pca}
 biplot(iris.pca)
 #or nicer:
 library(devtools)
-install_github("vqv/ggbiplot")
+devtools::install_github("richardjtelford/ggbiplot", ref = "experimental")
 library(ggbiplot)
-g <- ggbiplot(iris.pca, obs.scale = 1, var.scale = 1,
+g <- ggbiplot(pca, obs.scale = 1, var.scale = 1,
               groups = ir_species, ellipse = TRUE,
               circle = TRUE)
 g <- g + scale_color_discrete(name = '')
@@ -52,8 +52,74 @@ g <- g + theme(legend.direction = 'horizontal',
 print(g)
 ```
 
-NMDS & PERMANOVA
+[NMDS & PERMANOVA]{.ul}
+
 ```{r data}
 Herb <- read.csv(here("data/Herbivore_specialisation.csv"))
 ```
 
+```{r matrix}
+#Get the community matrix
+library(reshape2)
+#to get as many columns as species taking the sum of abundances
+Herbivores <- dcast(data = Herb, formula = Habitat + DayNight + Replicate + Mass ~ species,
+                    fun.aggregate = sum, value.var = "abundance")
+
+head(Herbivores)
+
+#simplify objects
+Habitat <- Herbivores$Habitat
+DayNight <- Herbivores$DayNight
+Herb_community <- Herbivores [,5:11]
+```
+
+[NMDS]{.ul}
+
+```{r}
+Herb_community.mds <- metaMDS(comm = Herb_community, distance = "bray")
+Herb_community.mds
+plot(Herb_community.mds$points, col = as.factor(Habitat), pch = 16)
+spp <- envfit(Herb_community.mds, Herb_community, permutations = 999)
+spp
+```
+
+pca para matriz de correlaciones y muchas variables y nmds para distancias y casos concretos
+
+[PERMANOVA]{.ul}
+
+```{r permanova}
+#hay diferencias entre habitats (valore medios creo)
+a <- adonis2(Herb_community ~ Habitat, method = "bray")
+a
+
+#diferencias en la dispersion
+b <- betadisper(vegdist(Herb_community), group = Habitat)
+b
+anova(b)
+boxplot(b)
+```
+
+GLM: cómo varía la abundancia de cada especie en función de un predictor, pero hay muchos ceros y muchas especie. **mvabun** lo que hace es fit muchos glms a la vez, es muy complejo pero el concepto es que puedes estimar este efecto de forma conjunta, más eficiente que una anova. Está menos trabajado por lo que tienes que buscarte la vida para la visualización.
+
+[THE **mvabund** WAY]{.ul}
+
+```{r mvabund}
+head(Herbivores)
+Herb_spp <- mvabund(Herbivores[,5:11])
+Herb_spp
+
+#explorar datos
+boxplot(Herb_spp)
+#ha hecho un meanvar.plot para ver que la media y la varianza de las variables está correlacionada, un raton no puede tener la varianza de peso que un elefante
+
+mod1 <- manyglm(Herb_spp ~ Habitat, family = "poisson")
+plot(mod1)
+#con esto vemos también que la varianza crece mucho con valores altos
+
+mod1 <- manyglm(Herb_spp ~ Habitat, family = "binomial-negative")
+plot(mod1)
+#ahora si están bien los residuos
+
+anova(mod1)
+#hay diferencias de composición entre hábitats
+```
