@@ -26,12 +26,34 @@ cor(iris[,1:4])
 
 #PCA analysis
 ```{r PCA, echo=FALSE}
-iris.pca <- prcomp(iris[,1:4])
+iris.pca <- prcomp(iris[,1:4], scale. = T)
 
 iris.pca
-#no me ha quedado claro como lo ha interpretado
+#cuanto importa cada variable en cada eje
 
 summary(iris.pca)
 #we can see component 1 is really good because it explains 92% of the variance
+```
+
+
+PLOTTING PCA
+```{r plotting pca}
+biplot(iris.pca)
+#or nicer:
+library(devtools)
+install_github("vqv/ggbiplot")
+library(ggbiplot)
+g <- ggbiplot(iris.pca, obs.scale = 1, var.scale = 1,
+              groups = ir_species, ellipse = TRUE,
+              circle = TRUE)
+g <- g + scale_color_discrete(name = '')
+g <- g + theme(legend.direction = 'horizontal',
+               legend.position = 'top')
+print(g)
+```
+
+NMDS & PERMANOVA
+```{r data}
+Herb <- read.csv(here("data/Herbivore_specialisation.csv"))
 ```
 
