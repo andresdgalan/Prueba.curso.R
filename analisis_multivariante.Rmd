@@ -1,0 +1,37 @@
+---
+title: "Análisis Multivariante"
+author: "PCA, permanova and more..."
+date: "22/9/2022"
+output: word_document
+---
+
+```{r Libraries, include=FALSE}
+library(vegan)
+library(mvabund)
+```
+
+```{r data, include=FALSE}
+data("iris")
+```
+
+
+
+CORRELATION BETWEEN FLOWER METRICS
+```{r plotting, echo=FALSE}
+#to plot all variables by pairs: we plot only numeric variables
+pairs(iris[,1:4])
+cor(iris[,1:4])
+```
+
+
+#PCA analysis
+```{r PCA, echo=FALSE}
+iris.pca <- prcomp(iris[,1:4])
+
+iris.pca
+#no me ha quedado claro como lo ha interpretado
+
+summary(iris.pca)
+#we can see component 1 is really good because it explains 92% of the variance
+```
+
