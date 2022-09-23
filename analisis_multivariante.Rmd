@@ -2,7 +2,9 @@
 title: "Análisis Multivariante"
 author: "PCA, permanova and more..."
 date: "22/9/2022"
-output: word_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r Libraries, include=FALSE}

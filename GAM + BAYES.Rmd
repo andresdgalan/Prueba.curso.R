@@ -1,0 +1,52 @@
+---
+title: "Generalised Aditive Models"
+author: "GAM"
+date: "23/9/2022"
+output: word_document
+---
+
+INFANT MORTALITY AND GDP
+```{r}
+mort <- read.csv("data/UN_GDP_infantmortality.csv")
+names(mort)
+library(mgcv)
+library(visreg)
+gam1 <- gam(infant.mortality ~ s(gdp, k = 10), data = mort)
+visreg(gam1)
+gam.check(gam1)
+```
+MIRAR EN DIAPOS LO QUE HA HECHO PACO PORQUE HA USADO BINOMIAL NEGATIVA (CONTEOS: PROBABILIDAD DE MUERTO O VIVO)
+
+BAYES
+
+```{r DATA}
+trees <- read.csv("data/trees.csv")
+trees$dbh.c <- trees$dbh - 25
+library("brms")
+height.formu <- brmsformula(height ~ dbh.c)
+get_prior(height.formu, data = trees)
+```
+
+```{r PRIORS}
+#creo que el 95% de los árboles de 25dbh van a tener una altura de 30 +- 10
+#yo sé que conforme aumenta el diámetro aumenta la altura y creo que con aumento de 1dbh, la altura va a aumentar 0.5 +- 0.4
+#resiudos centrados en cero con una desviación de 5, no muy informativa
+#clase es qué tipo de parámetro es
+priors <- c(
+set_prior("normal(30, 10)", class = "Intercept"),
+set_prior("normal(0.5, 0.4)", class = "b"),
+set_prior("normal(0, 5)", class = "sigma")
+)
+
+#para correr el modelo sin los datos, solo con los prior para ver si tiene sentido
+height.mod <- brm(height.formu,
+data = trees,
+prior = priors,
+sample_prior = "only")
+
+#para checkear
+pp_check(height.mod, ndraws = 100)
+#hay numeros negativos por la incertidumbre que le hemos dado y porque le hemos dado una distribución normal no truncada - hay que asegurarse de que las prior te den resultados con sentido
+```
+
+mirar en la web para establecer el prior: probability distribution explore
